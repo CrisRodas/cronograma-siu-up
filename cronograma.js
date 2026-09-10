@@ -306,14 +306,9 @@ function renderGantt() {
         else body += `<td class="task-info" style="text-align:center;color:#666">—</td>`;
         body += `<td class="task-info">${task.dev || ''}</td>`;
         body += `<td class="task-info" style="text-align:center">${task.days}d</td>`;
-        if (task.type === 'task') {
-            const manualMark = task.manual ? ' 📌' : '';
-            body += `<td class="task-info"><input type="date" class="date-input" value="${task.start}" onchange="setTaskStart('${task.id}', this.value)" title="Fecha de inicio editable"/>${manualMark}</td>`;
-            body += `<td class="task-info"><input type="date" class="date-input" value="${task.end}" onchange="setTaskEnd('${task.id}', this.value)" title="Fecha de fin editable"/></td>`;
-        } else {
-            body += `<td class="task-info">${formatDate(task.start)}</td>`;
-            body += `<td class="task-info">${formatDate(task.end)}</td>`;
-        }
+        const manualMark = (task.type === 'task' && task.manual) ? ' <span title="Fecha ajustada manualmente" style="color:#ffd93d">📌</span>' : '';
+        body += `<td class="task-info">${formatDate(task.start)}${manualMark}</td>`;
+        body += `<td class="task-info">${formatDate(task.end)}</td>`;
         if (task.type === 'task') body += `<td class="task-info" style="text-align:center"><input type="number" min="0" max="100" step="5" value="${progress}" class="pct-input" onchange="setTaskProgress('${task.id}', this.value)" />%</td>`;
         else body += `<td class="task-info pct-cell-group">${progress}%</td>`;
         body += `<td class="task-info">${task.preds}</td>`;
@@ -366,6 +361,8 @@ function renderSummary() {
     const delayed = active.filter(t => getDelayStatus(t) === 'delayed').length;
     const overdue = active.filter(t => getDelayStatus(t) === 'critical-delay').length;
     document.getElementById('summaryCards').innerHTML = `
+        <div class="card"><h3 style="font-size:1.2em;color:#4CAF50">${formatDateFull(projectStart)}</h3><p>📅 Fecha de inicio</p></div>
+        <div class="card"><h3 style="font-size:1.2em;color:#00d4ff">${formatDateFull(projectEnd)}</h3><p>🏁 Fecha fin</p></div>
         <div class="card"><h3>${getProjectProgress()}%</h3><p>Avance total</p></div>
         <div class="card"><h3>${active.length}</h3><p>Actividades</p></div>
         <div class="card"><h3>${devs.length}</h3><p>Recursos</p></div>
@@ -400,6 +397,26 @@ function renderProjectProgress() {
     const notStarted = active.filter(t => (t.progress || 0) === 0).length;
     document.getElementById('projectProgressDetail').innerHTML =
         `✅ Completadas: <b style="color:#4CAF50">${completed}</b> &nbsp;|&nbsp; 🔵 En progreso: <b style="color:#00d4ff">${inProgress}</b> &nbsp;|&nbsp; ⚪ Sin iniciar: <b style="color:#aaa">${notStarted}</b> &nbsp;|&nbsp; Avance ponderado por días de esfuerzo.`;
+}
+
+// ===== Editor de fechas (panel aparte, ordenado) =====
+function renderDateEditor() {
+    const container = document.getElementById('dateEditor');
+    if (!container) return;
+    const rows = tasks.filter(t => t.type === 'task').map(t => `
+        <tr>
+            <td class="de-id">${t.id}</td>
+            <td class="de-name">${t.name} <span style="color:${getDevColor(t.dev)}">(${t.dev})</span>${t.manual ? ' 📌' : ''}</td>
+            <td><input type="date" class="date-input" value="${t.start}" onchange="setTaskStart('${t.id}', this.value)"/></td>
+            <td><input type="date" class="date-input" value="${t.end}" onchange="setTaskEnd('${t.id}', this.value)"/></td>
+            <td style="text-align:center">${t.days}d</td>
+            <td style="text-align:center">${t.manual ? `<button class="de-clear" onclick="clearTaskDates('${t.id}')" title="Volver a fecha automática">↺</button>` : '<span style="color:#555">auto</span>'}</td>
+        </tr>`).join('');
+    container.innerHTML = `
+        <table class="date-editor-table">
+            <thead><tr><th>No</th><th>Actividad</th><th>Inicio</th><th>Fin</th><th>Dur.</th><th>Modo</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>`;
 }
 
 // ===== Hitos (una entrega por actividad) =====
@@ -555,6 +572,7 @@ function drawBarChart(ctx, title, labels, values, colors) {
 // ===== Orquestación =====
 function refreshAll() {
     renderGantt(); renderSummary(); renderProjectInfo(); renderProjectProgress();
+    renderDateEditor();
     renderHitos(); renderCriticalPath(); renderSwimlane(); renderDependencies(); renderSemaforo(); renderCharts();
 }
 function onStartChange(value) {

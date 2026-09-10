@@ -37,9 +37,19 @@
 
         input.pct-input { width: 48px; background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; text-align: center; font-size: 1em; padding: 2px; font-family: inherit; }
         input.pct-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
-        input.date-input { background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; font-size: 0.95em; padding: 2px 4px; font-family: inherit; }
+        input.date-input { background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; font-size: 0.9em; padding: 4px 6px; font-family: inherit; }
         input.date-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
         input.date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+
+        .date-editor { background: #16213e; border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 30px; overflow-x: auto; }
+        table.date-editor-table { border-collapse: collapse; width: 100%; }
+        table.date-editor-table th, table.date-editor-table td { padding: 7px 10px; font-size: 0.82em; border-bottom: 1px solid #2a2a4a; text-align: left; }
+        table.date-editor-table th { color: #00d4ff; font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.5px; }
+        table.date-editor-table tr:hover td { background: #0f2a4a; }
+        table.date-editor-table .de-id { color: #888; text-align: center; width: 40px; }
+        table.date-editor-table .de-name { color: #eee; min-width: 260px; }
+        .de-clear { background: #ffd93d22; color: #ffd93d; border: 1px solid #ffd93d66; border-radius: 5px; cursor: pointer; padding: 3px 9px; font-size: 1em; }
+        .de-clear:hover { background: #ffd93d44; }
         .pct-cell-group { color: #ffd93d; font-weight: bold; text-align: center; }
         .progress-bar-wrap { background: #0a1628; border-radius: 10px; height: 22px; overflow: hidden; position: relative; border: 1px solid #333; margin-top: 6px; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00838F, #00d4ff); transition: width 0.4s ease; }
@@ -169,6 +179,12 @@
     <div class="gantt-container">
         <table class="gantt" id="ganttTable"></table>
     </div>
+
+    <h2>📅 Editar Fechas por Actividad</h2>
+    <p style="color:#aaa;font-size:0.8em;margin-bottom:10px;">
+        Ajusta el inicio y fin de cada actividad. Las que edites quedan fijas (📌) y no se recalculan por predecesoras; el resto sigue en modo <b>auto</b>. Usa ↺ para volver una actividad a automático.
+    </p>
+    <div class="date-editor" id="dateEditor"></div>
 
     <h2>🏁 Entrega de Hitos</h2>
     <div class="hitos-container" id="hitosContainer"></div>
