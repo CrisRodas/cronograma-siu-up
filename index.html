@@ -135,12 +135,6 @@
     <h1>📊 Cronograma Rediseño SIU - UP</h1>
     <p class="subtitle" id="subtitle"></p>
 
-    <div class="controls">
-        <label for="startDate">📅 Fecha de inicio del proyecto:</label>
-        <input type="date" id="startDate" value="2026-10-19" onchange="onStartChange(this.value)" />
-        <span class="hint">Cambia la fecha y todo el cronograma (fechas, Gantt, hitos, semáforo) se recalcula automáticamente.</span>
-    </div>
-
     <div class="project-info" id="projectInfo"></div>
 
     <div class="legend">
@@ -170,7 +164,7 @@
 
     <h2>Diagrama de Gantt</h2>
     <p style="color:#aaa;font-size:0.8em;margin-bottom:10px;">
-        💡 Edita el <b style="color:#00d4ff">% de Avance</b> y las <b style="color:#00d4ff">fechas de Inicio/Fin</b> de cada tarea directamente en la tabla (se guarda en tu navegador).
+        💡 Edita el <b style="color:#00d4ff">% de Avance</b> y las <b style="color:#00d4ff">fechas de Inicio/Fin</b> directamente en la tabla (se guarda en tu navegador).
         Las tareas con fecha manual se marcan con 📌. Usa <b>Restaurar fechas automáticas</b> para volver al cálculo por predecesoras.
         Alertas: <span style="color:#4CAF50">🟢 En tiempo</span> ·
         <span style="color:#FF9800">⚠️ Retraso</span> ·
@@ -179,12 +173,6 @@
     <div class="gantt-container">
         <table class="gantt" id="ganttTable"></table>
     </div>
-
-    <h2>📅 Editar Fechas por Actividad</h2>
-    <p style="color:#aaa;font-size:0.8em;margin-bottom:10px;">
-        Ajusta el inicio y fin de cada actividad. Las que edites quedan fijas (📌) y no se recalculan por predecesoras; el resto sigue en modo <b>auto</b>. Usa ↺ para volver una actividad a automático.
-    </p>
-    <div class="date-editor" id="dateEditor"></div>
 
     <h2>🏁 Entrega de Hitos</h2>
     <div class="hitos-container" id="hitosContainer"></div>
