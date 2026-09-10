@@ -37,6 +37,9 @@
 
         input.pct-input { width: 48px; background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; text-align: center; font-size: 1em; padding: 2px; font-family: inherit; }
         input.pct-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
+        input.date-input { background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; font-size: 0.95em; padding: 2px 4px; font-family: inherit; }
+        input.date-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
+        input.date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
         .pct-cell-group { color: #ffd93d; font-weight: bold; text-align: center; }
         .progress-bar-wrap { background: #0a1628; border-radius: 10px; height: 22px; overflow: hidden; position: relative; border: 1px solid #333; margin-top: 6px; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00838F, #00d4ff); transition: width 0.4s ease; }
@@ -152,11 +155,13 @@
     </div>
     <div style="text-align:center">
         <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar avances a 0%</button>
+        <button class="btn-reset" onclick="resetAllDates()">📅 Restaurar fechas automáticas</button>
     </div>
 
     <h2>Diagrama de Gantt</h2>
     <p style="color:#aaa;font-size:0.8em;margin-bottom:10px;">
-        💡 Edita el <b style="color:#00d4ff">% de Avance</b> de cada tarea (se guarda en tu navegador).
+        💡 Edita el <b style="color:#00d4ff">% de Avance</b> y las <b style="color:#00d4ff">fechas de Inicio/Fin</b> de cada tarea directamente en la tabla (se guarda en tu navegador).
+        Las tareas con fecha manual se marcan con 📌. Usa <b>Restaurar fechas automáticas</b> para volver al cálculo por predecesoras.
         Alertas: <span style="color:#4CAF50">🟢 En tiempo</span> ·
         <span style="color:#FF9800">⚠️ Retraso</span> ·
         <span style="color:#ff1744">🔴 Vencida</span>.

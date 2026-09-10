@@ -60,7 +60,17 @@ let PROJECT_START = new Date('2026-10-19T00:00:00');
 let tasks = [];          // filas del gantt (project + group + tasks)
 let projectStart, projectEnd, allDays;
 
-// Calcula start/end de cada actividad respetando predecesoras y días hábiles
+// Overrides manuales de fechas por tarea: { id: {start:'YYYY-MM-DD', end:'YYYY-MM-DD'} }
+const DATE_KEY = 'siu_up_fechas';
+let dateOverrides = {};
+function loadDateOverrides() {
+    try { dateOverrides = JSON.parse(localStorage.getItem(DATE_KEY) || '{}'); }
+    catch (e) { dateOverrides = {}; }
+}
+function saveDateOverrides() { localStorage.setItem(DATE_KEY, JSON.stringify(dateOverrides)); }
+
+// Calcula start/end de cada actividad respetando predecesoras y días hábiles.
+// Si una tarea tiene override manual de fecha, se usa esa fecha (y no se recalcula).
 function computeSchedule() {
     const starts = {}, ends = {};
     const byId = {}; activities.forEach(a => byId[a.id] = a);
@@ -69,21 +79,65 @@ function computeSchedule() {
     while (pending.size && guard++ < 1000) {
         for (const id of Array.from(pending)) {
             const a = byId[id];
+            const ov = dateOverrides[id];
+            // Si el usuario fijó ambas fechas manualmente, se respetan sin depender de predecesoras
+            if (ov && ov.start && ov.end) {
+                starts[id] = new Date(ov.start + 'T00:00:00');
+                ends[id] = new Date(ov.end + 'T00:00:00');
+                pending.delete(id);
+                continue;
+            }
             if (a.preds.every(p => ends[p])) {
                 let s;
-                if (a.preds.length) {
+                if (ov && ov.start) {
+                    s = new Date(ov.start + 'T00:00:00');
+                } else if (a.preds.length) {
                     let latest = a.preds.map(p => ends[p]).reduce((m, x) => x > m ? x : m);
                     s = nextBusinessDay(latest);
                 } else {
                     s = firstBusinessOnOrAfter(PROJECT_START);
                 }
                 starts[id] = s;
-                ends[id] = addBusinessDays(s, a.days);
+                ends[id] = (ov && ov.end) ? new Date(ov.end + 'T00:00:00') : addBusinessDays(s, a.days);
                 pending.delete(id);
             }
         }
     }
     return { starts, ends };
+}
+
+// Edición manual de fechas de una tarea
+function setTaskStart(id, value) {
+    if (!value) return;
+    dateOverrides[id] = dateOverrides[id] || {};
+    dateOverrides[id].start = value;
+    saveDateOverrides();
+    rebuildAndRefresh();
+}
+function setTaskEnd(id, value) {
+    if (!value) return;
+    dateOverrides[id] = dateOverrides[id] || {};
+    dateOverrides[id].end = value;
+    saveDateOverrides();
+    rebuildAndRefresh();
+}
+function clearTaskDates(id) {
+    delete dateOverrides[id];
+    saveDateOverrides();
+    rebuildAndRefresh();
+}
+function resetAllDates() {
+    if (confirm('¿Restaurar todas las fechas al cálculo automático por predecesoras?')) {
+        dateOverrides = {};
+        saveDateOverrides();
+        rebuildAndRefresh();
+    }
+}
+function rebuildAndRefresh() {
+    const prev = {}; tasks.filter(t => t.type === 'task').forEach(t => prev[t.id] = t.progress || 0);
+    buildTasks();
+    tasks.forEach(t => { if (t.type === 'task') t.progress = progressMap[t.id] || prev[t.id] || 0; });
+    refreshAll();
 }
 
 function devKey(dev) {
@@ -121,11 +175,14 @@ function buildTasks() {
         start: ymd(projectStart), end: ymd(projectEnd), preds: "", risk: "-", type: "project"
     });
     activities.forEach(a => {
+        const effDays = countBusinessDays(starts[a.id], ends[a.id]);
+        const ov = dateOverrides[a.id];
         tasks.push({
-            id: String(a.id), name: a.name, dev: a.dev, days: a.days,
+            id: String(a.id), name: a.name, dev: a.dev, days: effDays,
             start: ymd(starts[a.id]), end: ymd(ends[a.id]),
             preds: a.preds.join(', '), risk: "TRUE", type: "task",
-            comentario: a.comentario
+            comentario: a.comentario,
+            manual: !!(ov && (ov.start || ov.end))
         });
     });
 
@@ -249,8 +306,14 @@ function renderGantt() {
         else body += `<td class="task-info" style="text-align:center;color:#666">—</td>`;
         body += `<td class="task-info">${task.dev || ''}</td>`;
         body += `<td class="task-info" style="text-align:center">${task.days}d</td>`;
-        body += `<td class="task-info">${formatDate(task.start)}</td>`;
-        body += `<td class="task-info">${formatDate(task.end)}</td>`;
+        if (task.type === 'task') {
+            const manualMark = task.manual ? ' 📌' : '';
+            body += `<td class="task-info"><input type="date" class="date-input" value="${task.start}" onchange="setTaskStart('${task.id}', this.value)" title="Fecha de inicio editable"/>${manualMark}</td>`;
+            body += `<td class="task-info"><input type="date" class="date-input" value="${task.end}" onchange="setTaskEnd('${task.id}', this.value)" title="Fecha de fin editable"/></td>`;
+        } else {
+            body += `<td class="task-info">${formatDate(task.start)}</td>`;
+            body += `<td class="task-info">${formatDate(task.end)}</td>`;
+        }
         if (task.type === 'task') body += `<td class="task-info" style="text-align:center"><input type="number" min="0" max="100" step="5" value="${progress}" class="pct-input" onchange="setTaskProgress('${task.id}', this.value)" />%</td>`;
         else body += `<td class="task-info pct-cell-group">${progress}%</td>`;
         body += `<td class="task-info">${task.preds}</td>`;
@@ -501,6 +564,7 @@ function onStartChange(value) {
 }
 
 // Init
+loadDateOverrides();
 buildTasks();
 loadProgress();
 refreshAll();
