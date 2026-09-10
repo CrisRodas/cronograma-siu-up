@@ -275,7 +275,7 @@ function delayBadge(status) {
 // ===== Render Gantt =====
 function renderGantt() {
     const table = document.getElementById('ganttTable');
-    let header = '<thead><tr><th>Riesgo</th><th style="min-width:280px">Nombre de la tarea</th><th style="min-width:95px">Alerta</th><th style="min-width:120px">Asignado a</th><th>Dur.</th><th>Inicio</th><th>Fin</th><th style="min-width:60px">% Avance</th><th>Pred.</th>';
+    let header = '<thead><tr><th>Riesgo</th><th style="min-width:280px">Nombre de la tarea</th><th style="min-width:95px">Alerta</th><th style="min-width:120px">Asignado a</th><th>Dur.</th><th style="min-width:130px">✏️ Inicio</th><th style="min-width:130px">✏️ Fin</th><th style="min-width:60px">% Avance</th><th>Pred.</th>';
     allDays.forEach(d => {
         const border = d.getDay() === 1 ? 'border-left:2px solid #444;' : '';
         header += `<th class="day-cell" style="${border}" title="${d.toLocaleDateString('es-CO')}">${d.getDate()}<br><span style="font-size:0.6em;color:#888">${months[d.getMonth()]}</span></th>`;

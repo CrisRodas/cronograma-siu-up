@@ -37,9 +37,11 @@
 
         input.pct-input { width: 48px; background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; text-align: center; font-size: 1em; padding: 2px; font-family: inherit; }
         input.pct-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
-        input.date-input { background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; font-size: 0.9em; padding: 4px 6px; font-family: inherit; }
+        input.date-input { background: #0a1628; border: 1px solid #00d4ff55; color: #00d4ff; border-radius: 4px; font-size: 0.95em; padding: 3px 4px; font-family: inherit; width: 118px; cursor: pointer; }
+        input.date-input:hover { border-color: #00d4ff; background: #0f2a4a; }
         input.date-input:focus { outline: none; border-color: #00d4ff; background: #0f2a4a; }
         input.date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+        table.gantt td.task-info:has(input.date-input) { min-width: 130px; }
 
         .date-editor { background: #16213e; border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 30px; overflow-x: auto; }
         table.date-editor-table { border-collapse: collapse; width: 100%; }
